@@ -1,0 +1,23 @@
+Name:                memexml
+Version:             0.1
+Synopsis:            Library for reading Meme XML output
+Description:         This library contains a data structure and functions for 
+		     reading output from the Meme motif finder program.
+Homepage:            todo
+License:             todo
+Author:              Florian Eggenhofer
+Maintainer:          egg@tbi.univie.ac.at
+Stability:           Experimental
+Category:            Bioinformatics
+Build-type:          Simple
+Cabal-version:       >=1.6
+
+source-repository head
+  type: git
+  location: git://github.com/eggzilla/memexml
+
+Library
+  Exposed-modules: Bio.MemeXML Bio.MemeData
+  Build-depends:   base >= 3 && < 5, biocore >= 0.3.0, todo
+  Hs-Source-Dirs:  src
+  Ghc-Options:     -Wall
