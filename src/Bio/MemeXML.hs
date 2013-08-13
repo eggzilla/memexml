@@ -1,38 +1,48 @@
-{- | Parse meme XML output.
-   xml parsing is done with the HXT libary.
--}
-
-
 {-# LANGUAGE Arrows, NoMonomorphismRestriction #-}
-module Bio.MemeXML ( parseXML
-                    , module Bio.MemeData) where
 
-import System.Environment (getArgs) 
-import Text.XML.HXT.Core 
-import System.IO
-import System.Console.GetOpt
-import Data.Char (isSpace)    
+-- | Parse meme XML output.
+--   xml parsing is done with the HXT libary.
+
+module Bio.MemeXML ( parseXML
+                   , atTag
+                   , atId
+                   , rstrip
+                   , getSequences
+                   , getMotif
+                   , getContributingSite
+                   , getSiteSequence
+                   , module Bio.MemeData) where
+
 import Bio.MemeData
-              
+--import System.Environment (getArgs) 
+import Text.XML.HXT.Core
+--import System.IO
+--import System.Console.GetOpt
+import Data.Char (isSpace)    
+
+parseXML :: String -> IOStateArrow s b XmlTree              
 parseXML file = readDocument [ withValidate no
                              , withRemoveWS yes  -- throw away formating WS
                              ] file
 
-atTag tag = deep (isElem >>> hasName tag) 
-atId id = deep (isElem >>> hasAttrValue "id" (== id) )
+--atTag :: ArrowXml a => String -> a (Data.Tree.NTree.TypeDefs.NTree XNode) XmlTree
+atTag tag = deep (isElem >>> hasName tag)
+--atId :: ArrowXml a => String -> a (Data.Tree.NTree.TypeDefs.NTree XNode) XmlTree            
+atId elementId = deep (isElem >>> hasAttrValue "id" (== elementId) )
 --remove whitespaces
+rstrip :: [Char] -> [Char]
 rstrip = reverse . dropWhile isSpace . reverse
---hasID id xs= filter (\id -> sequenceId == id) xs 
+
           
 getSequences = atTag "sequence" >>> 
-  proc sequence -> do
-    seqid <- getAttrValue "id" -< sequence
-    seqname <- getAttrValue "name" -< sequence
-    seqlength <- getAttrValue "length" -< sequence
+  proc nucleotideSequence -> do
+    nucleotideSeqId <- getAttrValue "id" -< nucleotideSequence
+    nucleotideSeqName <- getAttrValue "name" -< nucleotideSequence
+    nucleotideSeqLength <- getAttrValue "length" -< nucleotideSequence
     returnA -< Sequence {
-      sequenceId = seqid, 
-      sequenceName = seqname,
-      sequenceLength = seqlength}
+      sequenceId = nucleotideSeqId, 
+      sequenceName = nucleotideSeqName,
+      sequenceLength = nucleotideSeqLength}
     
 getMotif = atTag "motif"  >>> 
   proc motif -> do
@@ -55,11 +65,11 @@ getContributingSite = atTag "contributing_site" >>>
   contributing_site_pvalue <- getAttrValue "pvalue" -< contributingsite
   contributing_site_sequence <- listA getSiteSequence -< contributingsite
   returnA -<  ContributingSite {
-    siteId = contributing_site_id,
-    sitePosition = contributing_site_position,
-    siteStrand = contributing_site_strand,
-    sitePvalue = contributing_site_pvalue,
-    siteSequence = contributing_site_sequence}
+    contributingSiteId = contributing_site_id,
+    contributingSitePosition = contributing_site_position,
+    contributingSiteStrand = contributing_site_strand,
+    contributingSitePvalue = contributing_site_pvalue,
+    contributingSiteSequence = contributing_site_sequence}
 
 getSiteSequence = atTag "letter_ref" >>>
    proc letterreference -> do

@@ -3,8 +3,8 @@ Version:             0.1
 Synopsis:            Library for reading Meme XML output
 Description:         This library contains a data structure and functions for 
 		     reading output from the Meme motif finder program.
-Homepage:            todo
-License:             todo
+Homepage:            http://www.tbi.univie.ac.at/~egg/
+License:             BSD3
 Author:              Florian Eggenhofer
 Maintainer:          egg@tbi.univie.ac.at
 Stability:           Experimental
@@ -18,6 +18,6 @@ source-repository head
 
 Library
   Exposed-modules: Bio.MemeXML Bio.MemeData
-  Build-depends:   base >= 3 && < 5, biocore >= 0.3.0, todo
+  Build-depends:   base >= 3 && < 5, hxt >= 9.3.1.1
   Hs-Source-Dirs:  src
   Ghc-Options:     -Wall
