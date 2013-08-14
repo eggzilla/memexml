@@ -1,6 +1,6 @@
 {-# LANGUAGE Arrows, NoMonomorphismRestriction #-}
 
--- | Parse meme XML output.
+--   Parse meme XML output.
 --   xml parsing is done with the HXT libary.
 
 module Bio.MemeXML ( parseXML
@@ -14,10 +14,7 @@ module Bio.MemeXML ( parseXML
                    , module Bio.MemeData) where
 
 import Bio.MemeData
---import System.Environment (getArgs) 
 import Text.XML.HXT.Core
---import System.IO
---import System.Console.GetOpt
 import Data.Char (isSpace)    
 
 parseXML :: String -> IOStateArrow s b XmlTree              
@@ -25,25 +22,30 @@ parseXML file = readDocument [ withValidate no
                              , withRemoveWS yes  -- throw away formating WS
                              ] file
 
---atTag :: ArrowXml a => String -> a (Data.Tree.NTree.TypeDefs.NTree XNode) XmlTree
+--atTag :: ArrowXml a => String -> a (XmlTree XNode) XmlTree
+atTag :: ArrowXml a =>  String -> a XmlTree XmlTree
 atTag tag = deep (isElem >>> hasName tag)
---atId :: ArrowXml a => String -> a (Data.Tree.NTree.TypeDefs.NTree XNode) XmlTree            
+--atId :: ArrowXml a => String -> a (Data.Tree.NTree.TypeDefs.NTree XNode) XmlTree
+atId :: ArrowXml a =>  String -> a XmlTree XmlTree
 atId elementId = deep (isElem >>> hasAttrValue "id" (== elementId) )
 --remove whitespaces
 rstrip :: [Char] -> [Char]
 rstrip = reverse . dropWhile isSpace . reverse
 
-          
+getSequences :: ArrowXml a => a XmlTree Sequence          
 getSequences = atTag "sequence" >>> 
   proc nucleotideSequence -> do
     nucleotideSeqId <- getAttrValue "id" -< nucleotideSequence
     nucleotideSeqName <- getAttrValue "name" -< nucleotideSequence
     nucleotideSeqLength <- getAttrValue "length" -< nucleotideSequence
+    nucleotideSeqWeight <- getAttrValue "weight" -< nucleotideSequence
     returnA -< Sequence {
       sequenceId = nucleotideSeqId, 
       sequenceName = nucleotideSeqName,
-      sequenceLength = nucleotideSeqLength}
-    
+      sequenceLength = read (nucleotideSeqLength) :: Int,
+      sequenceWeight = read (nucleotideSeqWeight) :: Double}
+
+getMotif :: ArrowXml a => a XmlTree Motif  
 getMotif = atTag "motif"  >>> 
   proc motif -> do
     id_name <- getAttrValue "id" -< motif
@@ -57,6 +59,7 @@ getMotif = atTag "motif"  >>>
       motifRegularexpression = filter (/= '\n') regex,
       motifContributingsites = contributingsites }
 
+getContributingSite :: ArrowXml a => a XmlTree ContributingSite  
 getContributingSite = atTag "contributing_site" >>> 
   proc contributingsite -> do
   contributing_site_id <- getAttrValue "sequence_id" -< contributingsite
@@ -71,6 +74,7 @@ getContributingSite = atTag "contributing_site" >>>
     contributingSitePvalue = contributing_site_pvalue,
     contributingSiteSequence = contributing_site_sequence}
 
+getSiteSequence :: ArrowXml a => a XmlTree LetterReference
 getSiteSequence = atTag "letter_ref" >>>
    proc letterreference -> do
    letterid <- getAttrValue "letter_id" -< letterreference
