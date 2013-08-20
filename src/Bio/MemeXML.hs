@@ -1,6 +1,6 @@
 {-# LANGUAGE Arrows, NoMonomorphismRestriction #-}
 
---   Parse meme XML output.
+--   Parse Multiple EM for Motif Elicitation (MEME) XML output.
 --   xml parsing is done with the HXT libary.
 
 module Bio.MemeXML ( parseXML
@@ -22,13 +22,13 @@ parseXML file = readDocument [ withValidate no
                              , withRemoveWS yes  -- throw away formating WS
                              ] file
 
---atTag :: ArrowXml a => String -> a (XmlTree XNode) XmlTree
+
 atTag :: ArrowXml a =>  String -> a XmlTree XmlTree
 atTag tag = deep (isElem >>> hasName tag)
---atId :: ArrowXml a => String -> a (Data.Tree.NTree.TypeDefs.NTree XNode) XmlTree
+            
 atId :: ArrowXml a =>  String -> a XmlTree XmlTree
-atId elementId = deep (isElem >>> hasAttrValue "id" (== elementId) )
---remove whitespaces
+atId elementId = deep (isElem >>> hasAttrValue "id" (== elementId))
+                 
 rstrip :: [Char] -> [Char]
 rstrip = reverse . dropWhile isSpace . reverse
 

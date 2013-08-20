@@ -17,8 +17,8 @@ data TrainingSet = TrainingSet
   { datafile :: String
   , length :: Int
   , alphabet :: MemeAlphabet
-  , ambigs :: [MemeLetter]
-  , sequence :: [Sequence]
+  , ambigs :: MemeAmbigs
+  , sequences :: [Sequence]
   , letter_frequencies :: LetterFrequencies}
   deriving (Show, Eq)
 
@@ -96,23 +96,49 @@ data AlphabetArrayValue = AlphabetArrayValue
     frequency :: Double}
   deriving (Show, Eq)
 
-     
 --Detected motifs
 data Motif = Motif
   { motifId :: String
-  , motifWidth :: String
+  , motifName :: String
+  , motifWidth :: Int
+  , motifSites :: Int
+  , motifIc :: Double
+  , motifRe :: Double
+  , motifLlr :: Int
+  , motifEvalue :: Double
+  , motifBayesTreshold :: Double
+  , motifElapsedTime :: Double                          
   , motifRegularexpression :: String
+  , motifScores :: Scores
   , motifContributingsites :: [ContributingSite]}
   deriving (Show, Eq)
 
+data Scores = Scores
+  { scoreAlphabetMatrix :: AlphabetMatrix}
+  deriving (Show, Eq)
+
+data Propabilities = Propabilities
+  { propabilitiesAlphabetMatrix :: AlphabetMatrix}
+  deriving (Show, Eq)
+
+ data AlphabetMatrix = AlphabetMatrix
+  { AlphabetMatrix :: [AlphabetArray]}
+  deriving (Show, Eq)        
+  
 data ContributingSite = ContributingSite
   { contributingSiteId :: String
   , contributingSitePosition :: String
   , contributingSiteStrand :: String
-  , contributingSitePvalue :: String
-  , contributingSiteSequence :: [LetterReference] }
+  , contributingSitePvalue :: Double
+  , contributingSiteLeftFlank :: String
+  , contributingSiteRightFlank :: String
+  , contributingSite :: Site}
     deriving (Show, Eq)
 
+ data Site = Site
+  { Site :: [LetterReference]}
+  deriving (Show, Eq)
+             
 data LetterReference = LetterReference
   { letterReference :: String }
   deriving (Show, Eq)
