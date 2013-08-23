@@ -14,18 +14,18 @@ data MemeResult = MemeResult
 
 -- Description of input data
 data TrainingSet = TrainingSet
-  { datafile :: String
-  , length :: Int
-  , alphabet :: MemeAlphabet
-  , ambigs :: MemeAmbigs
-  , sequences :: [Sequence]
-  , letter_frequencies :: LetterFrequencies}
+  { trainingsetDatafile :: String
+  , trainingsetLength :: Int
+  , trainingsetAlphabet :: MemeAlphabet
+  , trainingsetAmbigs :: MemeAmbigs
+  , trainingsetSequences :: [Sequence]
+  , trainingsetLetterFrequencies :: LetterFrequencies}
   deriving (Show, Eq)
 
 data MemeAlphabet = MemeAlphabet
   { memeAlphabetId :: String
   , memeAlphabetLength :: Int
-  , letters :: [MemeLetter]}
+  , memeAlphabetLetters :: [MemeLetter]}
   deriving (Show, Eq)     
          
 data MemeLetter = MemeLetter
@@ -34,7 +34,7 @@ data MemeLetter = MemeLetter
   deriving (Show, Eq)
 
 data MemeAmbigs = MemeAmbigs
-  { ambigletters :: [MemeLetter]}
+  { memeAmbigLetters :: [MemeLetter]}
   deriving (Show, Eq)
            
 data Sequence = Sequence
@@ -50,36 +50,36 @@ data LetterFrequencies = LetterFrequencies
            
 -- Description of Processing
 data Model = Model
-  { command_line :: String
+  { commandLine :: String
   , host :: String
-  , model_type :: String
+  , modelType :: String
   , nmotifs :: Int
-  , evalue_threshold :: String
-  , object_function :: String
-  , min_width :: Int
-  , max_width :: Int
+  , evalueThreshold :: String
+  , objectFunction :: String
+  , minWidth :: Int
+  , maxWidth :: Int
   , minic :: Double
   , wg :: Int
   , ws :: Int
-  , endgaps :: String
-  , minsites :: Int
-  , maxsites :: Int
-  , wnsites :: Double
+  , endGaps :: String
+  , minSites :: Int
+  , maxSites :: Int
+  , wnSites :: Double
   , prob :: Int
-  , spmap :: String
-  , spfuzz :: Double
+  , spMap :: String
+  , spFuzz :: Double
   , prior :: String
   , beta :: Double
   , maxiter :: Int
   , distance :: Double
-  , num_sequences :: Int
-  , num_positions :: Int
+  , numSequences :: Int
+  , numPositions :: Int
   , seed :: Int
   , seqfrac :: String
   , strands :: String
-  , priors_file :: String
-  , reason_for_stopping :: String
-  , background_frequencies :: BackgroundFrequencies}
+  , priorsFile :: String
+  , reasonForStopping :: String
+  , backgroundFrequencies :: BackgroundFrequencies}
   deriving (Show, Eq)        
 
 data BackgroundFrequencies = BackgroundFrequencies
@@ -110,6 +110,7 @@ data Motif = Motif
   , motifElapsedTime :: Double                          
   , motifRegularexpression :: String
   , motifScores :: Scores
+  , motifProbabilites :: Propabilities                
   , motifContributingsites :: [ContributingSite]}
   deriving (Show, Eq)
 
@@ -121,42 +122,42 @@ data Propabilities = Propabilities
   { propabilitiesAlphabetMatrix :: AlphabetMatrix}
   deriving (Show, Eq)
 
- data AlphabetMatrix = AlphabetMatrix
-  { AlphabetMatrix :: [AlphabetArray]}
+data AlphabetMatrix = AlphabetMatrix
+  { alphabetMatrixArrays :: [AlphabetArray]}
   deriving (Show, Eq)        
   
 data ContributingSite = ContributingSite
   { contributingSiteId :: String
-  , contributingSitePosition :: String
+  , contributingSitePosition :: Int
   , contributingSiteStrand :: String
   , contributingSitePvalue :: Double
   , contributingSiteLeftFlank :: String
   , contributingSiteRightFlank :: String
   , contributingSite :: Site}
-    deriving (Show, Eq)
+  deriving (Show, Eq)
 
- data Site = Site
-  { Site :: [LetterReference]}
+data Site = Site
+  { siteLetterReferences :: [LetterReference]}
   deriving (Show, Eq)
              
 data LetterReference = LetterReference
-  { letterReference :: String }
+  { letterReference :: String}
   deriving (Show, Eq)
               
 data ScannedSiteSummary = ScannedSiteSummary
-  { p_thresh :: String
+  { p_thresh :: Double
   , scannedSites :: [ScannedSites]}
   deriving (Show, Eq)
            
 data ScannedSites = ScannedSites
-  { sequence_id :: String              
+  { scannedsitesSequenceId :: String              
   , scannedSitesPvalue :: Double
-  , num_sites :: Int
-  , scannedsite :: [ScannedSite]}
+  , numSites :: Int
+  , scannedSiteArray :: [ScannedSite]}
   deriving (Show, Eq)
            
 data ScannedSite = ScannedSite
-  { motif_id :: String              
+  { scannedsiteMotifId :: String              
   , strand :: String
   , position :: Int
   , scannedSitePvalue :: Double}
