@@ -1,9 +1,9 @@
--- This module contains a hierarchical data structure for
--- Multiple EM for Motif Elicitation (MEME) results
+-- | This module contains a hierarchical data structure for
+--   Multiple EM for Motif Elicitation (MEME) results
 
 module Bio.MemeData where
 
--- Document Root of Meme xml output
+-- | Document Root of Meme xml output
 data MemeResult = MemeResult 
   { memeversion, memerelease :: String
   , trainingset :: TrainingSet
@@ -12,7 +12,7 @@ data MemeResult = MemeResult
   , scanned_site_summary :: ScannedSiteSummary }
   deriving (Show, Eq)
 
--- Description of input data
+-- | Training set defines the data used for the motif search
 data TrainingSet = TrainingSet
   { trainingsetDatafile :: String
   , trainingsetLength :: Int
@@ -48,7 +48,7 @@ data LetterFrequencies = LetterFrequencies
   { letterFrequenciesAlphabetArray :: AlphabetArray}
   deriving (Show, Eq)
            
--- Description of Processing
+-- The model describes how to training set was processed
 data Model = Model
   { commandLine :: String
   , host :: String
@@ -96,7 +96,7 @@ data AlphabetArrayValue = AlphabetArrayValue
     frequency :: Double}
   deriving (Show, Eq)
 
---Detected motifs
+-- | The motifs are predicted by appying the model to the trainingset
 data Motif = Motif
   { motifId :: String
   , motifName :: String
@@ -143,7 +143,8 @@ data Site = Site
 data LetterReference = LetterReference
   { letterReference :: String}
   deriving (Show, Eq)
-              
+
+-- | Scanned sites contain all sites evaluated for possible motifs 
 data ScannedSiteSummary = ScannedSiteSummary
   { p_thresh :: Double
   , scannedSites :: [ScannedSites]}

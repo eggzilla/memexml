@@ -1,6 +1,6 @@
 {-# LANGUAGE Arrows, NoMonomorphismRestriction #-}
 
---   Parse Multiple EM for Motif Elicitation (MEME) XML output.
+-- | Parse Multiple EM for Motif Elicitation (MEME) XML output.
 --   xml parsing is done with the HXT libary.
 
 module Bio.MemeXML ( parseXML
@@ -16,22 +16,25 @@ import Bio.MemeData
 import Text.XML.HXT.Core
 import Data.Char (isSpace)    
 
+-- | Parse XML results in XML format
 parseXML :: String -> IOStateArrow s b XmlTree              
 parseXML file = readDocument [ withValidate no
                              , withRemoveWS yes  -- throw away formating WS
                              ] file
 
-
+-- | gets all subtrees with the specified tag name
 atTag :: ArrowXml a =>  String -> a XmlTree XmlTree
 atTag tag = deep (isElem >>> hasName tag)
-            
+
+-- | gets all subtrees with the specified id attribute
 atId :: ArrowXml a =>  String -> a XmlTree XmlTree
 atId elementId = deep (isElem >>> hasAttrValue "id" (== elementId))
-                 
+
+-- | removes whitespace characters                 
 rstrip :: [Char] -> [Char]
 rstrip = reverse . dropWhile isSpace . reverse
 
-
+-- | gets the whole memexml document tree 
 getMemeResult :: ArrowXml a => a XmlTree MemeResult  
 getMemeResult = atTag "MEME" >>> 
   proc memeResult -> do
@@ -48,7 +51,8 @@ getMemeResult = atTag "MEME" >>>
     model = memeResult_model,
     motifs = memeResult_motifs,
     scanned_site_summary = memeResult_scanned_site_summary}
-
+  
+-- | get the Training set subtree
 getTrainingSet :: ArrowXml a => a XmlTree TrainingSet  
 getTrainingSet = atTag "training_set" >>> 
   proc trainingSet -> do
@@ -66,9 +70,6 @@ getTrainingSet = atTag "training_set" >>>
     trainingsetSequences = trainingSet_sequences,
     trainingsetLetterFrequencies = trainingSet_letterfrequencies}
 
---gettrainingset
-  
-  --getalphabet
 getMemeAlphabet :: ArrowXml a => a XmlTree MemeAlphabet
 getMemeAlphabet = atTag "alphabet" >>> 
   proc memealphabet -> do
@@ -89,7 +90,6 @@ getLetter = atTag "letter" >>>
       memeLetterId = letter_id, 
       memeLetterSymbol = read (letter_symbol) :: Char}
 
-  --getambigs
 getAmbigs :: ArrowXml a => a XmlTree MemeAmbigs
 getAmbigs = atTag "ambigs" >>> 
   proc memeambigs -> do
@@ -120,6 +120,7 @@ getAlphabetArrayValues =  atTag "alphabet_array_value" >>>
       letterId = alphabetarrayvalue_id,
       frequency = read (alphabetarrayvalue_frequency) :: Double} 
 
+-- | get the model subtree    
 getModel :: ArrowXml a => a XmlTree Model
 getModel = atTag "model" >>>
   proc mememodel -> do
@@ -206,9 +207,8 @@ getSequence = atTag "sequence" >>>
       sequenceName = nucleotide_SeqName,
       sequenceLength = read (nucleotide_SeqLength) :: Int,
       sequenceWeight = read (nucleotide_SeqWeight) :: Double}
------
 
-
+-- | get a result motif
 getMotif :: ArrowXml a => a XmlTree Motif  
 getMotif = atTag "motif"  >>> 
   proc mememotif -> do
