@@ -1,5 +1,6 @@
 -- | This module contains a hierarchical data structure for
 --   Multiple EM for Motif Elicitation (MEME) results
+--   For more information on MEME consult: <http://meme.nbcr.net/meme/>
 
 module Bio.MemeData where
 
@@ -9,7 +10,7 @@ data MemeResult = MemeResult
   , trainingset :: TrainingSet
   , model :: Model
   , motifs :: [Motif]
-  , scanned_site_summary :: ScannedSiteSummary }
+  , scannedSiteSummary :: ScannedSiteSummary }
   deriving (Show, Eq)
 
 -- | Training set defines the data used for the motif search
@@ -146,7 +147,7 @@ data LetterReference = LetterReference
 
 -- | Scanned sites contain all sites evaluated for possible motifs 
 data ScannedSiteSummary = ScannedSiteSummary
-  { p_thresh :: Double
+  { pThresh :: Double
   , scannedSites :: [ScannedSites]}
   deriving (Show, Eq)
            

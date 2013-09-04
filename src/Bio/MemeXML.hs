@@ -1,12 +1,23 @@
-{-# LANGUAGE Arrows, NoMonomorphismRestriction #-}
+{-# LANGUAGE Arrows #-}
 
 -- | Parse Multiple EM for Motif Elicitation (MEME) XML output.
 --   xml parsing is done with the HXT libary.
-
+--   For more information on MEME consult: <http://meme.nbcr.net/meme/>
 module Bio.MemeXML ( parseXML
                    , atTag
                    , atId
                    , rstrip
+                   , getMemeResult
+                   , getTrainingSet
+                   , getMemeAlphabet
+                   , getLetter
+                   , getAmbigs
+                   , getLetterFrequencies
+                   , getModel
+                   , getBackgroundFrequencies
+                   , getScannedSiteSummary
+                   , getScannedSites
+                   , getScannedSite
                    , getSequence
                    , getMotif
                    , getContributingSite
@@ -18,10 +29,10 @@ import Data.Char (isSpace)
 
 -- | Parse XML results in XML format
 parseXML :: String -> IOStateArrow s b XmlTree              
-parseXML file = readDocument [ withValidate no
-                             , withRemoveWS yes  -- throw away formating WS
-                             ] file
-
+parseXML = readDocument [ withValidate no
+                        , withRemoveWS yes  -- throw away formating WS
+                        ] 
+           
 -- | gets all subtrees with the specified tag name
 atTag :: ArrowXml a =>  String -> a XmlTree XmlTree
 atTag tag = deep (isElem >>> hasName tag)
@@ -31,7 +42,7 @@ atId :: ArrowXml a =>  String -> a XmlTree XmlTree
 atId elementId = deep (isElem >>> hasAttrValue "id" (== elementId))
 
 -- | removes whitespace characters                 
-rstrip :: [Char] -> [Char]
+rstrip :: String -> String
 rstrip = reverse . dropWhile isSpace . reverse
 
 -- | gets the whole memexml document tree 
@@ -50,7 +61,7 @@ getMemeResult = atTag "MEME" >>>
     trainingset = memeResult_training_set,
     model = memeResult_model,
     motifs = memeResult_motifs,
-    scanned_site_summary = memeResult_scanned_site_summary}
+    scannedSiteSummary = memeResult_scanned_site_summary}
   
 -- | get the Training set subtree
 getTrainingSet :: ArrowXml a => a XmlTree TrainingSet  
@@ -64,7 +75,7 @@ getTrainingSet = atTag "training_set" >>>
   trainingSet_letterfrequencies <- getLetterFrequencies -< trainingSet
   returnA -< TrainingSet {
     trainingsetDatafile = trainingSet_datafile,
-    trainingsetLength = read (trainingSet_length) :: Int,
+    trainingsetLength = read trainingSet_length :: Int,
     trainingsetAlphabet = trainingSet_alphabet,
     trainingsetAmbigs = trainingSet_ambigs,
     trainingsetSequences = trainingSet_sequences,
@@ -78,7 +89,7 @@ getMemeAlphabet = atTag "alphabet" >>>
     alphabet_letters <- listA getLetter -< memealphabet
     returnA -< MemeAlphabet {
       memeAlphabetId = alphabet_id, 
-      memeAlphabetLength = read (alphabet_length) :: Int,
+      memeAlphabetLength = read alphabet_length :: Int,
       memeAlphabetLetters = alphabet_letters}
 
 getLetter :: ArrowXml a => a XmlTree MemeLetter
@@ -88,7 +99,7 @@ getLetter = atTag "letter" >>>
     letter_symbol <- getAttrValue "symbol" -< memeletter
     returnA -< MemeLetter {
       memeLetterId = letter_id, 
-      memeLetterSymbol = read (letter_symbol) :: Char}
+      memeLetterSymbol = read letter_symbol :: Char}
 
 getAmbigs :: ArrowXml a => a XmlTree MemeAmbigs
 getAmbigs = atTag "ambigs" >>> 
@@ -118,7 +129,7 @@ getAlphabetArrayValues =  atTag "alphabet_array_value" >>>
     alphabetarrayvalue_frequency <- getText <<< getChildren -< memealphabetarrayvalue
     returnA -< AlphabetArrayValue {
       letterId = alphabetarrayvalue_id,
-      frequency = read (alphabetarrayvalue_frequency) :: Double} 
+      frequency = read alphabetarrayvalue_frequency :: Double} 
 
 -- | get the model subtree    
 getModel :: ArrowXml a => a XmlTree Model
@@ -158,28 +169,28 @@ getModel = atTag "model" >>>
         commandLine = model_command_line,
         host = model_host,
         modelType = model_type,
-        nmotifs = read (model_nmotifs) :: Int,
+        nmotifs = read model_nmotifs :: Int,
         evalueThreshold = model_evalue_threshold,
         objectFunction = model_object_function,
-        minWidth = read (model_min_width) :: Int,
-        maxWidth = read (model_max_width) :: Int,
-        minic = read (model_minic) :: Double,
-        wg = read (model_wg) :: Int,
-        ws = read (model_ws) :: Int,
+        minWidth = read model_min_width :: Int,
+        maxWidth = read model_max_width :: Int,
+        minic = read model_minic :: Double,
+        wg = read model_wg :: Int,
+        ws = read model_ws :: Int,
         endGaps = model_endgaps,
-        minSites = read (model_minsites) :: Int,
-        maxSites = read (model_maxsites) :: Int,
-        wnSites = read (model_wnsites) :: Double,
-        prob = read (model_prob) :: Int,
+        minSites = read model_minsites :: Int,
+        maxSites = read model_maxsites :: Int,
+        wnSites = read model_wnsites :: Double,
+        prob = read model_prob :: Int,
         spMap = model_spmap,
-        spFuzz = read (model_spfuzz) :: Double,
+        spFuzz = read model_spfuzz :: Double,
         prior = model_prior,
-        beta = read (model_beta) :: Double,
-        maxiter = read (model_maxiter) :: Int,
-        distance = read (model_distance) :: Double,
-        numSequences =  read (model_num_sequences) :: Int,
-        numPositions = read (model_num_positions) :: Int,
-        seed = read (model_seed) :: Int,
+        beta = read model_beta :: Double,
+        maxiter = read model_maxiter :: Int,
+        distance = read model_distance :: Double,
+        numSequences =  read model_num_sequences :: Int,
+        numPositions = read model_num_positions :: Int,
+        seed = read model_seed :: Int,
         seqfrac = model_seqfrac,
         strands =  model_strands,
         priorsFile =  model_priors_file,
@@ -205,8 +216,8 @@ getSequence = atTag "sequence" >>>
     returnA -< Sequence {
       sequenceId = nucleotide_SeqId, 
       sequenceName = nucleotide_SeqName,
-      sequenceLength = read (nucleotide_SeqLength) :: Int,
-      sequenceWeight = read (nucleotide_SeqWeight) :: Double}
+      sequenceLength = read nucleotide_SeqLength :: Int,
+      sequenceWeight = read nucleotide_SeqWeight :: Double}
 
 -- | get a result motif
 getMotif :: ArrowXml a => a XmlTree Motif  
@@ -229,14 +240,14 @@ getMotif = atTag "motif"  >>>
     returnA -< Motif {
       motifId = motif_id, 
       motifName = motif_name,
-      motifWidth = read (motif_width) :: Int,
-      motifSites = read (motif_sites) :: Int,
-      motifIc = read (motif_ic) :: Double,
-      motifRe = read (motif_re) :: Double,
-      motifLlr = read (motif_llr) :: Int, 
-      motifEvalue = read (motif_e_value) :: Double,
-      motifBayesTreshold = read (motif_bayes_threshold) :: Double,
-      motifElapsedTime = read (motif_elapsed_time) :: Double,
+      motifWidth = read motif_width :: Int,
+      motifSites = read motif_sites :: Int,
+      motifIc = read motif_ic :: Double,
+      motifRe = read motif_re :: Double,
+      motifLlr = read motif_llr :: Int, 
+      motifEvalue = read motif_e_value :: Double,
+      motifBayesTreshold = read motif_bayes_threshold :: Double,
+      motifElapsedTime = read motif_elapsed_time :: Double,
       -- regex field contains 2 linebreaks
       motifRegularexpression = filter (/= '\n') regex,
       motifScores = motif_scores,
@@ -276,9 +287,9 @@ getContributingSite = atTag "contributing_site" >>>
   contributing_site_right_flank <- getText <<< getChildren <<< atTag "right_flank"  -< contributingsite
   returnA -<  ContributingSite {
     contributingSiteId = contributing_site_id,
-    contributingSitePosition = read (contributing_site_position) :: Int,
+    contributingSitePosition = read contributing_site_position :: Int,
     contributingSiteStrand = contributing_site_strand,
-    contributingSitePvalue = read (contributing_site_pvalue) :: Double,
+    contributingSitePvalue = read contributing_site_pvalue :: Double,
     contributingSiteLeftFlank = contributing_site_left_flank,
     contributingSite = contributing_site,
     contributingSiteRightFlank = contributing_site_right_flank}
@@ -303,7 +314,7 @@ getScannedSiteSummary = atTag "scanned_sites_summary" >>>
     scannedsitesummary_p_tresh <- getAttrValue "p_thresh" -< scannedsitesummary
     scannedsites <- listA getScannedSites -< scannedsitesummary
     returnA -< ScannedSiteSummary{
-      p_thresh = read (scannedsitesummary_p_tresh) :: Double,
+      pThresh = read scannedsitesummary_p_tresh :: Double,
       scannedSites = scannedsites}
 
 getScannedSites :: ArrowXml a => a XmlTree ScannedSites
@@ -315,8 +326,8 @@ getScannedSites = atTag "scanned_sites" >>>
     scannedsites_array <- listA getScannedSite -< scannedsites
     returnA -< ScannedSites{
       scannedsitesSequenceId = scannedsites_sequence_id,
-      scannedSitesPvalue = read (scannedsites_pvalue) :: Double,
-      numSites = read (scannedsites_num_sites) :: Int,
+      scannedSitesPvalue = read scannedsites_pvalue :: Double,
+      numSites = read scannedsites_num_sites :: Int,
       scannedSiteArray = scannedsites_array}
                                
 getScannedSite :: ArrowXml a => a XmlTree ScannedSite
@@ -329,5 +340,5 @@ getScannedSite = atTag "scanned_site" >>>
     returnA -< ScannedSite{
       scannedsiteMotifId = scannedsite_motif_id,
       strand = scannedsite_strand,
-      position = read (scannedsite_position) :: Int,
-      scannedSitePvalue = read (scannedsite_sitepvalue) :: Double}   
+      position = read scannedsite_position :: Int,
+      scannedSitePvalue = read scannedsite_sitepvalue :: Double}   
