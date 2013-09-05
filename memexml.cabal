@@ -44,7 +44,7 @@ cabal-version:       >=1.8
 
 library
   -- Modules exported by the library.
-  exposed-modules:     MemeXMLTest, Bio.MemeXML, Bio.MemeData
+  exposed-modules:     Bio.MemeXML, Bio.MemeData
   
   -- Modules included in this library but not exported.
   -- other-modules:       
