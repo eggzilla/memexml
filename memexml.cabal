@@ -16,7 +16,12 @@ version:             0.0.1
 synopsis:            Library for reading Meme XML output
 
 -- A longer description of the package.
--- description:         
+description:         Parse Multiple EM for Motif Elicitation (MEME) XML output.
+		     XML parsing is done with the HXT libary.
+		     .
+	   	     For more information on MEME consult: <http://meme.nbcr.net/meme/>
+                     .
+		     The memexml git repository can be found at: <https://github.com/eggzilla/memexml>
 
 -- The license under which the package is released.
 license:             BSD3
@@ -33,6 +38,8 @@ maintainer:          egg@tbi.univie.ac.at
 
 -- A copyright notice.
 -- copyright:           
+
+homepage:	     https://github.com/eggzilla/memexml
 
 category:            Bioinformatics
 
