@@ -10,7 +10,7 @@ name:                memexml
 -- PVP summary:      +-+------- breaking API changes
 --                   | | +----- non-breaking API additions
 --                   | | | +--- code changes with no API change
-version:             0.0.2
+version:             0.0.3
 
 -- A short (one-line) description of the package.
 synopsis:            Library for reading Meme XML output
@@ -34,7 +34,7 @@ author:              Florian Eggenhofer
 
 -- An email address to which users can send suggestions, bug reports, and 
 -- patches.
-maintainer:          egg@tbi.univie.ac.at
+maintainer:          florian.eggenhofer@univie.ac.at
 
 -- A copyright notice.
 -- copyright:           
@@ -48,6 +48,14 @@ build-type:          Simple
 -- Constraint on the version of Cabal needed to build this package.
 cabal-version:       >=1.8
 
+source-repository head
+  type:     git
+  location: https://github.com/eggzilla/memexml
+
+source-repository this
+  type:     git
+  location: https://github.com/eggzilla/Taxonomy/tree/0.0.3
+  tag:      0.0.3
 
 library
   -- Modules exported by the library.
@@ -57,8 +65,7 @@ library
   -- other-modules:       
   
   -- Other library packages from which modules are imported.
-  build-depends:       base ==4.5.*, hxt ==9.3.*
-  
+  build-depends:       base, hxt
   -- Directories containing source files.
   hs-source-dirs:      src
   
